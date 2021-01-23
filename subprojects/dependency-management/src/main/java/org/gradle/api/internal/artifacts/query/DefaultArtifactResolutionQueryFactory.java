@@ -16,6 +16,7 @@
 package org.gradle.api.internal.artifacts.query;
 
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
+import org.gradle.api.artifacts.query.ArtifactResolutionQueryFactory;
 import org.gradle.api.internal.artifacts.GlobalDependencyResolutionRules;
 import org.gradle.api.internal.artifacts.RepositoriesSupplier;
 import org.gradle.api.internal.artifacts.configurations.ConfigurationContainerInternal;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradle.api.internal.artifacts.query;
+package org.gradle.api.artifacts.query;
 
-import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
-
+/**
+ * Defines a factory to be used by external and internal tooling to create
+ * new instances of {@link ArtifactResolutionQuery}.
+ */
+@FunctionalInterface
 public interface ArtifactResolutionQueryFactory {
+
+    /**
+     * Invoked when a new query is requested.
+     * This method should always return a new instance.
+     *
+     * @return A new {@link ArtifactResolutionQuery} to be used.
+     */
     ArtifactResolutionQuery createArtifactResolutionQuery();
 }

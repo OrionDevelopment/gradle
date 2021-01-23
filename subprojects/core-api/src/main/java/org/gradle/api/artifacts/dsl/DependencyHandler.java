@@ -22,6 +22,7 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ExternalModuleDependency;
 import org.gradle.api.artifacts.MinimalExternalModuleDependency;
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
+import org.gradle.api.artifacts.query.ArtifactResolutionQueryFactory;
 import org.gradle.api.artifacts.transform.TransformAction;
 import org.gradle.api.artifacts.transform.TransformParameters;
 import org.gradle.api.artifacts.transform.TransformSpec;
@@ -624,4 +625,18 @@ public interface DependencyHandler extends ExtensionAware {
         return variantOf(dependencyProvider, ExternalModuleDependencyVariantSpec::testFixtures);
     }
 
+    /**
+     * The factory used to create new artifact resolution queries for this dependency handler.
+     *
+     * @return The {@link ArtifactResolutionQueryFactory} used to create new queries to lookup artifacts.
+     */
+    ArtifactResolutionQueryFactory getArtifactResolutionQueryFactory();
+
+    /**
+     * Allows for overriding the query factory used to create new {@link org.gradle.api.artifacts.query.ArtifactResolutionQuery}.
+     * This endpoint exists so that queries can be adapted by plugins for a given dependency handler.
+     *
+     * @param factory The new {@link ArtifactResolutionQueryFactory} to be used in the future.
+     */
+    void setArtifactResolutionQueryFactory(final ArtifactResolutionQueryFactory factory);
 }

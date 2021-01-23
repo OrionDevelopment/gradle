@@ -44,7 +44,7 @@ import org.gradle.api.attributes.Category;
 import org.gradle.api.attributes.HasConfigurableAttributes;
 import org.gradle.api.internal.artifacts.VariantTransformRegistry;
 import org.gradle.api.internal.artifacts.dependencies.DefaultMinimalDependencyVariant;
-import org.gradle.api.internal.artifacts.query.ArtifactResolutionQueryFactory;
+import org.gradle.api.artifacts.query.ArtifactResolutionQueryFactory;
 import org.gradle.api.internal.provider.DefaultValueSourceProviderFactory;
 import org.gradle.api.internal.std.DependencyBundleValueSource;
 import org.gradle.api.model.ObjectFactory;
@@ -77,7 +77,7 @@ public abstract class DefaultDependencyHandler implements DependencyHandler, Met
     private final DependencyConstraintHandler dependencyConstraintHandler;
     private final ComponentMetadataHandler componentMetadataHandler;
     private final ComponentModuleMetadataHandler componentModuleMetadataHandler;
-    private final ArtifactResolutionQueryFactory resolutionQueryFactory;
+    private ArtifactResolutionQueryFactory resolutionQueryFactory;
     private final AttributesSchema attributesSchema;
     private final VariantTransformRegistry transforms;
     private final Factory<ArtifactTypeContainer> artifactTypeContainer;
@@ -419,6 +419,16 @@ public abstract class DefaultDependencyHandler implements DependencyHandler, Met
         public Dependency add(Configuration configuration, Object dependencyNotation, @Nullable Closure configureAction) {
             return doAdd(configuration, dependencyNotation, configureAction);
         }
+    }
+
+    @Override
+    public ArtifactResolutionQueryFactory getArtifactResolutionQueryFactory() {
+        return this.resolutionQueryFactory;
+    }
+
+    @Override
+    public void setArtifactResolutionQueryFactory(ArtifactResolutionQueryFactory factory) {
+        this.resolutionQueryFactory = factory;
     }
 
     public static class DefaultExternalModuleDependencyVariantSpec implements ExternalModuleDependencyVariantSpec {
