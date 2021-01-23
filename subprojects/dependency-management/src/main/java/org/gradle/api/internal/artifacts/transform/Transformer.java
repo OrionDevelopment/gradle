@@ -75,4 +75,6 @@ public interface Transformer extends Describable, TaskDependencyContainer {
     DirectorySensitivity getInputArtifactDirectorySensitivity();
 
     DirectorySensitivity getInputArtifactDependenciesDirectorySensitivity();
+
+    boolean requiresDependencyHashing();
 }

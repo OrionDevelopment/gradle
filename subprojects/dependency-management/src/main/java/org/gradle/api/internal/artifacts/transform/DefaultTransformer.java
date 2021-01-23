@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.reflect.TypeToken;
 import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.artifacts.transform.IgnoreDependenciesForIdentity;
 import org.gradle.api.artifacts.transform.InputArtifact;
 import org.gradle.api.artifacts.transform.InputArtifactDependencies;
 import org.gradle.api.artifacts.transform.TransformAction;
@@ -108,6 +109,7 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
     private final CalculatedValueContainer<IsolatedParameters, IsolateTransformerParameters> isolatedParameters;
     private final DirectorySensitivity artifactDirectorySensitivity;
     private final DirectorySensitivity dependenciesDirectorySensitivity;
+    private final boolean requiresDependenciesHashing;
 
     public DefaultTransformer(
         Class<? extends TransformAction<?>> implementationClass,
@@ -144,6 +146,7 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
         this.isolatedParameters = calculatedValueContainerFactory.create(Describables.of("parameters of", this),
             new IsolateTransformerParameters(parameterObject, implementationClass, cacheable, owner, parameterPropertyWalker, isolatableFactory, buildOperationExecutor, classLoaderHierarchyHasher,
                 valueSnapshotter, fileCollectionFactory));
+        this.requiresDependenciesHashing = !implementationClass.isAnnotationPresent(IgnoreDependenciesForIdentity.class);
     }
 
     /**
@@ -173,6 +176,7 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
         this.isolatedParameters = isolatedParameters;
         this.artifactDirectorySensitivity = artifactDirectorySensitivity;
         this.dependenciesDirectorySensitivity = dependenciesDirectorySensitivity;
+        this.requiresDependenciesHashing = !implementationClass.isAnnotationPresent(IgnoreDependenciesForIdentity.class);
     }
 
     public static void validateInputFileNormalizer(String propertyName, @Nullable Class<? extends FileNormalizer> normalizer, boolean cacheable, TypeValidationContext validationContext) {
@@ -229,6 +233,11 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
     @Override
     public HashCode getSecondaryInputHash() {
         return isolatedParameters.get().getSecondaryInputsHash();
+    }
+
+    @Override
+    public boolean requiresDependencyHashing() {
+        return this.requiresDependenciesHashing;
     }
 
     @Override

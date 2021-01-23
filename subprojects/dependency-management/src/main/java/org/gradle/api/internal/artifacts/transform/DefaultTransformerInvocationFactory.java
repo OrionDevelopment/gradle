@@ -123,7 +123,10 @@ public class DefaultTransformerInvocationFactory implements TransformerInvocatio
 
         FileSystemLocationSnapshot inputArtifactSnapshot = fileSystemAccess.read(inputArtifact.getAbsolutePath(), Function.identity());
         String normalizedInputPath = inputArtifactFingerprinter.normalizePath(inputArtifactSnapshot);
-        CurrentFileCollectionFingerprint dependenciesFingerprint = dependencies.fingerprint(dependencyFingerprinter);
+
+        //Select if we need the hash the dependencies or not.
+        final ArtifactTransformDependencies dependenciesToFingerprint = transformer.requiresDependencyHashing() ? dependencies : DefaultTransformUpstreamDependenciesResolver.NO_RESULT;
+        CurrentFileCollectionFingerprint dependenciesFingerprint = dependenciesToFingerprint.fingerprint(dependencyFingerprinter);
 
         UnitOfWork.Identity identity = getTransformationIdentity(producerProject, inputArtifactSnapshot, normalizedInputPath, transformer, dependenciesFingerprint);
 

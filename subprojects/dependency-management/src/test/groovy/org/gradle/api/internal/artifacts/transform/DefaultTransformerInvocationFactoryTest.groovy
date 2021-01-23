@@ -246,6 +246,11 @@ class DefaultTransformerInvocationFactoryTest extends AbstractProjectBuilderSpec
         DirectorySensitivity getInputArtifactDependenciesDirectorySensitivity() {
             return DirectorySensitivity.DEFAULT
         }
+
+        @Override
+        boolean requiresDependencyHashing() {
+            return true;
+        }
     }
 
     @Unroll

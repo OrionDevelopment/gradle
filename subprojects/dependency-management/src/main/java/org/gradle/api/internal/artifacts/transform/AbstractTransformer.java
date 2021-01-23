@@ -44,6 +44,11 @@ public abstract class AbstractTransformer<T> implements Transformer {
         return implementationClass.getSimpleName();
     }
 
+    @Override
+    public boolean requiresDependencyHashing() {
+        return true;
+    }
+
     protected static void appendActionImplementation(Class<?> implementation, Hasher hasher, ClassLoaderHierarchyHasher classLoaderHierarchyHasher) {
         hasher.putString(implementation.getName());
         hasher.putHash(classLoaderHierarchyHasher.getClassLoaderHash(implementation.getClassLoader()));
