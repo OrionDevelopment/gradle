@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList
 import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.transform.TransformAction
+import org.gradle.api.artifacts.transform.TransformerDependenciesModifier
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.internal.artifacts.DefaultBuildIdentifier
 import org.gradle.api.internal.artifacts.DefaultProjectComponentIdentifier
@@ -245,6 +246,11 @@ class DefaultTransformerInvocationFactoryTest extends AbstractProjectBuilderSpec
         @Override
         DirectorySensitivity getInputArtifactDependenciesDirectorySensitivity() {
             return DirectorySensitivity.DEFAULT
+        }
+
+        @Override
+        TransformerDependenciesModifier getDependenciesFilter() {
+            return TransformerDependenciesModifier.NO_OP;
         }
     }
 

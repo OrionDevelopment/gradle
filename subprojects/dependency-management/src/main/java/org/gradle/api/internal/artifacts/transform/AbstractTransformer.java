@@ -16,6 +16,7 @@
 
 package org.gradle.api.internal.artifacts.transform;
 
+import org.gradle.api.artifacts.transform.TransformerDependenciesModifier;
 import org.gradle.api.internal.attributes.ImmutableAttributes;
 import org.gradle.internal.hash.ClassLoaderHierarchyHasher;
 import org.gradle.internal.hash.Hasher;
@@ -42,6 +43,11 @@ public abstract class AbstractTransformer<T> implements Transformer {
     @Override
     public String getDisplayName() {
         return implementationClass.getSimpleName();
+    }
+
+    @Override
+    public TransformerDependenciesModifier getDependenciesFilter() {
+        return TransformerDependenciesModifier.NO_OP;
     }
 
     protected static void appendActionImplementation(Class<?> implementation, Hasher hasher, ClassLoaderHierarchyHasher classLoaderHierarchyHasher) {

@@ -18,6 +18,7 @@ package org.gradle.api.internal.artifacts.transform;
 
 import com.google.common.collect.ImmutableList;
 import org.gradle.api.Describable;
+import org.gradle.api.artifacts.transform.TransformerDependenciesModifier;
 import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.internal.attributes.ImmutableAttributes;
 import org.gradle.api.internal.tasks.TaskDependencyContainer;
@@ -75,4 +76,6 @@ public interface Transformer extends Describable, TaskDependencyContainer {
     DirectorySensitivity getInputArtifactDirectorySensitivity();
 
     DirectorySensitivity getInputArtifactDependenciesDirectorySensitivity();
+
+    TransformerDependenciesModifier getDependenciesFilter();
 }

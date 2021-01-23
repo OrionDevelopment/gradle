@@ -21,10 +21,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.reflect.TypeToken;
 import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.artifacts.HasFilteredDependencies;
 import org.gradle.api.artifacts.transform.InputArtifact;
 import org.gradle.api.artifacts.transform.InputArtifactDependencies;
 import org.gradle.api.artifacts.transform.TransformAction;
 import org.gradle.api.artifacts.transform.TransformParameters;
+import org.gradle.api.artifacts.transform.TransformerDependenciesModifier;
 import org.gradle.api.artifacts.transform.VariantTransformConfigurationException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileSystemLocation;
@@ -108,6 +110,7 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
     private final CalculatedValueContainer<IsolatedParameters, IsolateTransformerParameters> isolatedParameters;
     private final DirectorySensitivity artifactDirectorySensitivity;
     private final DirectorySensitivity dependenciesDirectorySensitivity;
+    private final TransformerDependenciesModifier transformerDependenciesModifier;
 
     public DefaultTransformer(
         Class<? extends TransformAction<?>> implementationClass,
@@ -144,6 +147,16 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
         this.isolatedParameters = calculatedValueContainerFactory.create(Describables.of("parameters of", this),
             new IsolateTransformerParameters(parameterObject, implementationClass, cacheable, owner, parameterPropertyWalker, isolatableFactory, buildOperationExecutor, classLoaderHierarchyHasher,
                 valueSnapshotter, fileCollectionFactory));
+
+        if (requiresDependencies && implementationClass.isAnnotationPresent(HasFilteredDependencies.class)) {
+            final HasFilteredDependencies hasFilteredDependencies = implementationClass.getAnnotation(HasFilteredDependencies.class);
+            final Class<? extends TransformerDependenciesModifier> modifierClass = hasFilteredDependencies.getModifier();
+            this.transformerDependenciesModifier = (TransformerDependenciesModifier) internalServices.get(modifierClass);
+        }
+        else
+        {
+            this.transformerDependenciesModifier = TransformerDependenciesModifier.NO_OP;
+        }
     }
 
     /**
@@ -173,6 +186,16 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
         this.isolatedParameters = isolatedParameters;
         this.artifactDirectorySensitivity = artifactDirectorySensitivity;
         this.dependenciesDirectorySensitivity = dependenciesDirectorySensitivity;
+
+        if (requiresDependencies && implementationClass.isAnnotationPresent(HasFilteredDependencies.class)) {
+            final HasFilteredDependencies hasFilteredDependencies = implementationClass.getAnnotation(HasFilteredDependencies.class);
+            final Class<? extends TransformerDependenciesModifier> modifierClass = hasFilteredDependencies.getModifier();
+            this.transformerDependenciesModifier = (TransformerDependenciesModifier) internalServices.get(modifierClass);
+        }
+        else
+        {
+            this.transformerDependenciesModifier = TransformerDependenciesModifier.NO_OP;
+        }
     }
 
     public static void validateInputFileNormalizer(String propertyName, @Nullable Class<? extends FileNormalizer> normalizer, boolean cacheable, TypeValidationContext validationContext) {
@@ -247,6 +270,11 @@ public class DefaultTransformer extends AbstractTransformer<TransformAction<?>> 
     @Override
     public void isolateParametersIfNotAlready() {
         isolatedParameters.finalizeIfNotAlready();
+    }
+
+    @Override
+    public TransformerDependenciesModifier getDependenciesFilter() {
+        return this.transformerDependenciesModifier;
     }
 
     private static void fingerprintParameters(

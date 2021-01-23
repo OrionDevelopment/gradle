@@ -82,6 +82,8 @@ public class TransformationStep implements Transformation, TaskDependencyContain
 
         Try<ArtifactTransformDependencies> resolvedDependencies = upstreamDependencies.computeArtifacts();
         return resolvedDependencies
+            .map(dependencies -> transformer.getDependenciesFilter().filter(dependencies.getFiles()))
+            .map(DefaultArtifactTransformDependencies::new)
             .map(dependencies -> {
                 ImmutableList<File> inputArtifacts = subjectToTransform.getFiles();
                 if (inputArtifacts.isEmpty()) {
